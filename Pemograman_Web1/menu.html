@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>Menu Lengkap — CrunchCo</title>
+  <link rel="stylesheet" href="style.css"/>
+  <style>
+    .page-hero{background:linear-gradient(135deg,var(--mirage-900) 0%,var(--mirage-800) 60%,var(--mirage-700) 100%);padding:64px 5vw;position:relative;overflow:hidden;}
+    .page-hero::before{content:'🍪';position:absolute;right:8vw;top:50%;transform:translateY(-50%);font-size:14rem;opacity:.07;pointer-events:none;}
+    .page-hero-inner{position:relative;z-index:1;}
+    .breadcrumb{display:flex;align-items:center;gap:8px;margin-bottom:16px;font-size:0.8rem;}
+    .breadcrumb a{color:var(--mirage-300);}.breadcrumb a:hover{color:var(--amber-300);}
+    .breadcrumb .sep{color:var(--mirage-500);}.breadcrumb .cur{color:var(--amber-300);font-weight:600;}
+    .page-hero h1{font-size:clamp(2rem,4vw,3rem);font-weight:900;color:white;letter-spacing:-0.04em;margin-bottom:10px;}
+    .page-hero h1 span{color:var(--amber-300);}
+    .page-hero p{color:var(--mirage-300);font-size:1rem;}
+    .filter-bar{background:white;border-bottom:1px solid var(--border);padding:20px 5vw;display:flex;align-items:center;gap:16px;flex-wrap:wrap;position:sticky;top:68px;z-index:90;box-shadow:0 2px 12px rgba(0,0,0,.06);}
+    .search-input-wrap{flex:1;min-width:240px;position:relative;}
+    .search-input-wrap .icon{position:absolute;left:14px;top:50%;transform:translateY(-50%);font-size:1rem;pointer-events:none;}
+    .search-input-wrap input{width:100%;padding:10px 16px 10px 42px;border:2px solid var(--border);border-radius:10px;font-family:'Montserrat',sans-serif;font-size:0.875rem;font-weight:500;outline:none;transition:border-color .2s;background:var(--smoke-50);}
+    .search-input-wrap input:focus{border-color:var(--amber-400);background:white;}
+    .filter-tabs{display:flex;gap:8px;flex-wrap:wrap;}
+    .filter-tab{padding:8px 18px;border-radius:20px;font-size:0.8rem;font-weight:700;cursor:pointer;border:2px solid var(--border);background:white;color:var(--smoke-600);font-family:'Montserrat',sans-serif;transition:all .2s;}
+    .filter-tab:hover{border-color:var(--amber-400);color:var(--amber-700);}
+    .filter-tab.active{background:var(--mirage-800);border-color:var(--mirage-800);color:white;}
+    .sort-select{padding:10px 16px;border:2px solid var(--border);border-radius:10px;font-family:'Montserrat',sans-serif;font-size:0.8rem;font-weight:600;outline:none;cursor:pointer;background:white;color:var(--smoke-700);}
+    .menu-layout{display:grid;grid-template-columns:260px 1fr;gap:32px;padding:40px 5vw;align-items:start;}
+    .sidebar{background:white;border-radius:16px;padding:24px;box-shadow:var(--shadow);position:sticky;top:130px;}
+    .sidebar-title{font-size:0.75rem;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--amber-600);margin-bottom:16px;}
+    .sidebar-section{margin-bottom:28px;}
+    .sidebar-section h4{font-size:0.85rem;font-weight:700;color:var(--smoke-800);margin-bottom:12px;}
+    .check-item{display:flex;align-items:center;gap:10px;margin-bottom:10px;cursor:pointer;}
+    .check-item input[type=checkbox]{accent-color:var(--amber-500);width:16px;height:16px;}
+    .check-item label{font-size:0.82rem;color:var(--smoke-600);cursor:pointer;font-weight:500;}
+    .price-display{display:flex;justify-content:space-between;font-size:0.78rem;color:var(--text-muted);font-weight:600;margin-top:6px;}
+    .product-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;}
+    .menu-card{background:white;border-radius:18px;overflow:hidden;box-shadow:var(--shadow);transition:transform .25s,box-shadow .25s;display:flex;flex-direction:column;}
+    .menu-card:hover{transform:translateY(-6px);box-shadow:var(--shadow-lg);}
+    .menu-card-img{height:180px;position:relative;flex-shrink:0;overflow:hidden;}
+    .menu-card-img img{width:100%;height:100%;object-fit:cover;transition:transform .4s;}
+    .menu-card:hover .menu-card-img img{transform:scale(1.06);}
+    /* fallback */
+    .menu-card-img .img-fallback{display:none;width:100%;height:100%;align-items:center;justify-content:center;font-size:4rem;}
+    .mc-amber{background:linear-gradient(135deg,var(--amber-100),var(--amber-200));}
+    .mc-mirage{background:linear-gradient(135deg,var(--mirage-100),var(--mirage-200));}
+    .mc-smoke{background:linear-gradient(135deg,var(--smoke-100),var(--smoke-200));}
+    .mc-mix1{background:linear-gradient(135deg,#fde68a,#fcd34d);}
+    .mc-mix2{background:linear-gradient(135deg,#d1fae5,#a7f3d0);}
+    .mc-mix3{background:linear-gradient(135deg,#fee2e2,#fecaca);}
+    .mc-mix4{background:linear-gradient(135deg,#e0e7ff,#c7d2fe);}
+    .mc-mix5{background:linear-gradient(135deg,#f3e8ff,#e9d5ff);}
+    .mc-mix6{background:linear-gradient(135deg,#ecfdf5,#a7f3d0);}
+    .menu-card-img img.broken{display:none;}
+    .menu-card-img img.broken~.img-fallback{display:flex;}
+    .card-badges{position:absolute;top:10px;left:10px;display:flex;flex-direction:column;gap:4px;z-index:2;}
+    .menu-card-body{padding:18px 18px 20px;display:flex;flex-direction:column;flex:1;}
+    .menu-card-name{font-size:0.95rem;font-weight:800;color:var(--smoke-900);margin-bottom:4px;}
+    .menu-card-desc{font-size:0.78rem;color:var(--text-secondary);line-height:1.6;margin-bottom:14px;flex:1;}
+    .menu-card-rating{display:flex;align-items:center;gap:4px;margin-bottom:12px;}
+    .stars{color:var(--amber-400);font-size:0.75rem;}
+    .rating-val{font-size:0.75rem;font-weight:700;color:var(--smoke-600);}
+    .review-count{font-size:0.7rem;color:var(--text-muted);}
+    .menu-card-footer{display:flex;align-items:center;justify-content:space-between;padding-top:12px;border-top:1px solid var(--smoke-100);}
+    .menu-price{font-size:1.1rem;font-weight:900;color:var(--amber-700);}
+    .menu-price small{font-size:0.7rem;color:var(--text-muted);font-weight:500;}
+    .cart-btn{background:var(--amber-500);color:var(--smoke-900);border:none;padding:8px 16px;border-radius:8px;font-size:0.78rem;font-weight:700;font-family:'Montserrat',sans-serif;cursor:pointer;transition:all .2s;}
+    .cart-btn:hover{background:var(--amber-400);transform:scale(1.05);}
+    .results-info{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;}
+    .results-info p{font-size:0.82rem;color:var(--text-muted);font-weight:500;}
+    .pagination{display:flex;justify-content:center;gap:8px;margin-top:48px;}
+    .page-btn{width:40px;height:40px;border-radius:10px;border:2px solid var(--border);background:white;font-family:'Montserrat',sans-serif;font-size:0.85rem;font-weight:700;cursor:pointer;transition:all .2s;color:var(--smoke-600);}
+    .page-btn:hover,.page-btn.active{background:var(--mirage-800);border-color:var(--mirage-800);color:white;}
+    @media(max-width:1000px){.menu-layout{grid-template-columns:1fr;}.sidebar{position:static;}.product-grid{grid-template-columns:1fr 1fr;}}
+    @media(max-width:600px){.product-grid{grid-template-columns:1fr;}}
+  </style>
+</head>
+<body>
+<nav class="navbar">
+  <a href="index.html" class="nav-logo"><span class="icon">🍪</span> CrunchCo</a>
+  <ul class="nav-links" id="navLinks">
+    <li><a href="index.html">Beranda</a></li>
+    <li><a href="menu.html" class="active">Menu</a></li>
+    <li><a href="about.html">Tentang Kami</a></li>
+    <li><a href="tracking.html" class="nav-track">📦 Pesananku</a></li>
+    <li><a href="order.html" class="nav-cta">Pesan Sekarang</a></li>
+  </ul>
+  <div class="nav-hamburger" onclick="toggleNav()"><span></span><span></span><span></span></div>
+</nav>
+
+<div class="page-hero">
+  <div class="page-hero-inner">
+    <div class="breadcrumb"><a href="index.html">Beranda</a><span class="sep">›</span><span class="cur">Menu</span></div>
+    <h1>Menu Lengkap<br><span>CrunchCo</span></h1>
+    <p>20+ varian cookie artisan, semua dibuat segar setiap hari</p>
+  </div>
+</div>
+
+<div class="filter-bar">
+  <div class="search-input-wrap"><span class="icon">🔍</span><input type="text" placeholder="Cari cookie favorit kamu..." id="searchInput" oninput="filterCards()"/></div>
+  <div class="filter-tabs">
+    <button class="filter-tab active" onclick="setFilter(this,'semua')">Semua</button>
+    <button class="filter-tab" onclick="setFilter(this,'choco')">Coklat</button>
+    <button class="filter-tab" onclick="setFilter(this,'fruity')">Fruity</button>
+    <button class="filter-tab" onclick="setFilter(this,'nutty')">Nutty</button>
+    <button class="filter-tab" onclick="setFilter(this,'classic')">Classic</button>
+    <button class="filter-tab" onclick="setFilter(this,'premium')">Premium</button>
+  </div>
+  <select class="sort-select"><option>Urutkan: Populer</option><option>Harga Terendah</option><option>Harga Tertinggi</option><option>Rating Terbaik</option></select>
+</div>
+
+<div class="menu-layout">
+  <aside class="sidebar">
+    <div class="sidebar-title">✦ Filter</div>
+    <div class="sidebar-section">
+      <h4>Kategori</h4>
+      <label class="check-item"><input type="checkbox" checked/><label>Semua Kategori</label></label>
+      <label class="check-item"><input type="checkbox"/><label>🍫 Coklat & Choco</label></label>
+      <label class="check-item"><input type="checkbox"/><label>🍓 Buah-buahan</label></label>
+      <label class="check-item"><input type="checkbox"/><label>🥜 Kacang-kacangan</label></label>
+      <label class="check-item"><input type="checkbox"/><label>🌿 Herbal & Matcha</label></label>
+      <label class="check-item"><input type="checkbox"/><label>🎁 Spesial / Seasonal</label></label>
+    </div>
+    <div class="sidebar-section">
+      <h4>Rentang Harga</h4>
+      <input type="range" min="15000" max="75000" value="50000" style="width:100%;accent-color:var(--amber-500);" oninput="document.getElementById('pv').textContent='≤ Rp '+(this.value/1000|0)+'rb'"/>
+      <div class="price-display"><span>Rp 15rb</span><span id="pv">≤ Rp 50rb</span></div>
+    </div>
+    <div class="sidebar-section">
+      <h4>Rating</h4>
+      <label class="check-item"><input type="checkbox"/><label>⭐⭐⭐⭐⭐ (5.0)</label></label>
+      <label class="check-item"><input type="checkbox" checked/><label>⭐⭐⭐⭐ (4.0+)</label></label>
+      <label class="check-item"><input type="checkbox"/><label>⭐⭐⭐ (3.0+)</label></label>
+    </div>
+    <button class="btn btn-primary" style="width:100%;justify-content:center;">Terapkan Filter</button>
+  </aside>
+
+  <main>
+    <div class="results-info"><p>Menampilkan <strong id="countShown">20</strong> produk</p></div>
+    <div class="product-grid" id="productGrid">
+
+      <!-- CHOCO -->
+      <div class="menu-card" data-cat="choco">
+        <div class="menu-card-img"><img src="images/choco-chip-classic.jpg" alt="Choco Chip Classic" loading="lazy" onerror="this.classList.add('broken')"/><div class="img-fallback mc-amber">🍪</div><div class="card-badges"><span class="badge badge-amber">Terlaris</span></div></div>
+        <div class="menu-card-body"><div class="menu-card-name">Choco Chip Classic</div><div class="menu-card-rating"><span class="stars">★★★★★</span><span class="rating-val">4.9</span><span class="review-count">(248)</span></div><div class="menu-card-desc">Cookie renyah dengan biji coklat premium dan mentega Prancis pilihan.</div><div class="menu-card-footer"><div class="menu-price">Rp 25.000 <small>/pcs</small></div><button class="cart-btn" onclick="addToCart('Choco Chip Classic')">+ Keranjang</button></div></div>
+      </div>
+
+      <div class="menu-card" data-cat="choco">
+        <div class="menu-card-img"><img src="images/double-choco-fudge.jpg" alt="Double Chocolate Fudge" loading="lazy" onerror="this.classList.add('broken')"/><div class="img-fallback mc-mirage">🍫</div><div class="card-badges"><span class="badge badge-mirage">Premium</span></div></div>
+        <div class="menu-card-body"><div class="menu-card-name">Double Chocolate Fudge</div><div class="menu-card-rating"><span class="stars">★★★★★</span><span class="rating-val">5.0</span><span class="review-count">(74)</span></div><div class="menu-card-desc">Coklat hitam Belgia 70% dengan fudge filling yang meleleh sempurna.</div><div class="menu-card-footer"><div class="menu-price">Rp 35.000 <small>/pcs</small></div><button class="cart-btn" onclick="addToCart('Double Choco Fudge')">+ Keranjang</button></div></div>
+      </div>
+
+      <div class="menu-card" data-cat="choco">
+        <div class="menu-card-img"><img src="images/matcha-white-choco.jpg" alt="Matcha White Choco" loading="lazy" onerror="this.classList.add('broken')"/><div class="img-fallback mc-mix6">🌿</div><div class="card-badges"><span class="badge badge-smoke">Baru</span></div></div>
+        <div class="menu-card-body"><div class="menu-card-name">Matcha White Choco</div><div class="menu-card-rating"><span class="stars">★★★★★</span><span class="rating-val">4.8</span><span class="review-count">(119)</span></div><div class="menu-card-desc">Matcha premium Jepang dengan coklat putih Belgia, kombinasi sempurna.</div><div class="menu-card-footer"><div class="menu-price">Rp 33.000 <small>/pcs</small></div><button class="cart-btn" onclick="addToCart('Matcha White Choco')">+ Keranjang</button></div></div>
+      </div>
+
+      <!-- FRUITY -->
+      <div class="menu-card" data-cat="fruity">
+        <div class="menu-card-img"><img src="images/blueberry-crumble.jpg" alt="Blueberry Crumble" loading="lazy" onerror="this.classList.add('broken')"/><div class="img-fallback mc-mirage">🫐</div><div class="card-badges"><span class="badge badge-mirage">Baru</span></div></div>
+        <div class="menu-card-body"><div class="menu-card-name">Blueberry Crumble</div><div class="menu-card-rating"><span class="stars">★★★★★</span><span class="rating-val">4.8</span><span class="review-count">(185)</span></div><div class="menu-card-desc">Blueberry segar dengan taburan crumble gurih. Segar dan lembut.</div><div class="menu-card-footer"><div class="menu-price">Rp 30.000 <small>/pcs</small></div><button class="cart-btn" onclick="addToCart('Blueberry Crumble')">+ Keranjang</button></div></div>
+      </div>
+
+      <div class="menu-card" data-cat="fruity">
+        <div class="menu-card-img"><img src="images/lemon-zesty.jpg" alt="Lemon Zesty" loading="lazy" onerror="this.classList.add('broken')"/><div class="img-fallback mc-mix1">🍋</div><div class="card-badges"><span class="badge badge-smoke">Favorit</span></div></div>
+        <div class="menu-card-body"><div class="menu-card-name">Lemon Zesty</div><div class="menu-card-rating"><span class="stars">★★★★★</span><span class="rating-val">4.7</span><span class="review-count">(132)</span></div><div class="menu-card-desc">Citrus segar dari lemon asli dengan glazur manis di bagian atas.</div><div class="menu-card-footer"><div class="menu-price">Rp 28.000 <small>/pcs</small></div><button class="cart-btn" onclick="addToCart('Lemon Zesty')">+ Keranjang</button></div></div>
+      </div>
+
+      <div class="menu-card" data-cat="fruity">
+        <div class="menu-card-img"><img src="images/strawberry-jam-swirl.jpg" alt="Strawberry Jam Swirl" loading="lazy" onerror="this.classList.add('broken')"/><div class="img-fallback mc-mix3">🍓</div></div>
+        <div class="menu-card-body"><div class="menu-card-name">Strawberry Jam Swirl</div><div class="menu-card-rating"><span class="stars">★★★★☆</span><span class="rating-val">4.4</span><span class="review-count">(88)</span></div><div class="menu-card-desc">Selai strawberry homemade yang diswirl cantik ke dalam adonan cookie lembut.</div><div class="menu-card-footer"><div class="menu-price">Rp 30.000 <small>/pcs</small></div><button class="cart-btn" onclick="addToCart('Strawberry Jam Swirl')">+ Keranjang</button></div></div>
+      </div>
+
+      <div class="menu-card" data-cat="fruity">
+        <div class="menu-card-img"><img src="images/raspberry-cheesecream.jpg" alt="Raspberry Cheesecream" loading="lazy" onerror="this.classList.add('broken')"/><div class="img-fallback mc-mix3">🫙</div></div>
+        <div class="menu-card-body"><div class="menu-card-name">Raspberry Cheesecream</div><div class="menu-card-rating"><span class="stars">★★★★☆</span><span class="rating-val">4.5</span><span class="review-count">(61)</span></div><div class="menu-card-desc">Cookie vanilla dengan cream cheese frosting dan raspberry merah segar di atasnya.</div><div class="menu-card-footer"><div class="menu-price">Rp 32.000 <small>/pcs</small></div><button class="cart-btn" onclick="addToCart('Raspberry Cheesecream')">+ Keranjang</button></div></div>
+      </div>
+
+      <!-- NUTTY -->
+      <div class="menu-card" data-cat="nutty">
+        <div class="menu-card-img"><img src="images/peanut-butter-bliss.jpg" alt="Peanut Butter Bliss" loading="lazy" onerror="this.classList.add('broken')"/><div class="img-fallback mc-smoke">🥜</div></div>
+        <div class="menu-card-body"><div class="menu-card-name">Peanut Butter Bliss</div><div class="menu-card-rating"><span class="stars">★★★★☆</span><span class="rating-val">4.6</span><span class="review-count">(97)</span></div><div class="menu-card-desc">Kacang tanah pilihan digiling halus, tekstur creamy yang kaya rasa.</div><div class="menu-card-footer"><div class="menu-price">Rp 27.000 <small>/pcs</small></div><button class="cart-btn" onclick="addToCart('Peanut Butter Bliss')">+ Keranjang</button></div></div>
+      </div>
+
+      <div class="menu-card" data-cat="nutty">
+        <div class="menu-card-img"><img src="images/coconut-delight.jpg" alt="Coconut Delight" loading="lazy" onerror="this.classList.add('broken')"/><div class="img-fallback mc-mix2">🥥</div></div>
+        <div class="menu-card-body"><div class="menu-card-name">Coconut Delight</div><div class="menu-card-rating"><span class="stars">★★★★☆</span><span class="rating-val">4.3</span><span class="review-count">(63)</span></div><div class="menu-card-desc">Kelapa parut panggang dengan kombinasi vanilla dan santan asli yang gurih.</div><div class="menu-card-footer"><div class="menu-price">Rp 26.000 <small>/pcs</small></div><button class="cart-btn" onclick="addToCart('Coconut Delight')">+ Keranjang</button></div></div>
+      </div>
+
+      <div class="menu-card" data-cat="nutty">
+        <div class="menu-card-img"><img src="images/hazelnut-praline.jpg" alt="Hazelnut Praline" loading="lazy" onerror="this.classList.add('broken')"/><div class="img-fallback mc-amber">🌰</div></div>
+        <div class="menu-card-body"><div class="menu-card-name">Hazelnut Praline</div><div class="menu-card-rating"><span class="stars">★★★★★</span><span class="rating-val">4.7</span><span class="review-count">(52)</span></div><div class="menu-card-desc">Praline hazelnut pecahan di atas cookie coklat tua, drizzle coklat susu mengkilap.</div><div class="menu-card-footer"><div class="menu-price">Rp 34.000 <small>/pcs</small></div><button class="cart-btn" onclick="addToCart('Hazelnut Praline')">+ Keranjang</button></div></div>
+      </div>
+
+      <!-- CLASSIC -->
+      <div class="menu-card" data-cat="classic">
+        <div class="menu-card-img"><img src="images/vanilla-butter-classic.jpg" alt="Vanilla Butter Classic" loading="lazy" onerror="this.classList.add('broken')"/><div class="img-fallback mc-amber">🧈</div></div>
+        <div class="menu-card-body"><div class="menu-card-name">Vanilla Butter Classic</div><div class="menu-card-rating"><span class="stars">★★★★☆</span><span class="rating-val">4.5</span><span class="review-count">(211)</span></div><div class="menu-card-desc">Cookie klasik vanila dengan mentega premium, renyah dan harum sempurna.</div><div class="menu-card-footer"><div class="menu-price">Rp 22.000 <small>/pcs</small></div><button class="cart-btn" onclick="addToCart('Vanilla Butter Classic')">+ Keranjang</button></div></div>
+      </div>
+
+      <div class="menu-card" data-cat="classic">
+        <div class="menu-card-img"><img src="images/brown-sugar-oatmeal.jpg" alt="Brown Sugar Oatmeal" loading="lazy" onerror="this.classList.add('broken')"/><div class="img-fallback mc-mix1">🌾</div></div>
+        <div class="menu-card-body"><div class="menu-card-name">Brown Sugar Oatmeal</div><div class="menu-card-rating"><span class="stars">★★★★☆</span><span class="rating-val">4.4</span><span class="review-count">(147)</span></div><div class="menu-card-desc">Cookie tebal bertekstur kasar dari oat, warna coklat kemerahan dari brown sugar.</div><div class="menu-card-footer"><div class="menu-price">Rp 24.000 <small>/pcs</small></div><button class="cart-btn" onclick="addToCart('Brown Sugar Oatmeal')">+ Keranjang</button></div></div>
+      </div>
+
+      <div class="menu-card" data-cat="classic">
+        <div class="menu-card-img"><img src="images/cinnamon-sugar-roll.jpg" alt="Cinnamon Sugar Roll" loading="lazy" onerror="this.classList.add('broken')"/><div class="img-fallback mc-amber">🌀</div></div>
+        <div class="menu-card-body"><div class="menu-card-name">Cinnamon Sugar Roll</div><div class="menu-card-rating"><span class="stars">★★★★☆</span><span class="rating-val">4.6</span><span class="review-count">(78)</span></div><div class="menu-card-desc">Cookie spiral kayu manis dengan taburan gula kristal berkilau di atasnya.</div><div class="menu-card-footer"><div class="menu-price">Rp 26.000 <small>/pcs</small></div><button class="cart-btn" onclick="addToCart('Cinnamon Sugar Roll')">+ Keranjang</button></div></div>
+      </div>
+
+      <!-- PREMIUM -->
+      <div class="menu-card" data-cat="premium">
+        <div class="menu-card-img"><img src="images/matcha-red-bean.jpg" alt="Matcha Red Bean" loading="lazy" onerror="this.classList.add('broken')"/><div class="img-fallback mc-mix6">🍵</div><div class="card-badges"><span class="badge badge-mirage">Premium</span></div></div>
+        <div class="menu-card-body"><div class="menu-card-name">Matcha Red Bean</div><div class="menu-card-rating"><span class="stars">★★★★★</span><span class="rating-val">4.9</span><span class="review-count">(44)</span></div><div class="menu-card-desc">Cookie matcha dengan isian red bean paste, permukaan retak cantik khas Jepang.</div><div class="menu-card-footer"><div class="menu-price">Rp 35.000 <small>/pcs</small></div><button class="cart-btn" onclick="addToCart('Matcha Red Bean')">+ Keranjang</button></div></div>
+      </div>
+
+      <div class="menu-card" data-cat="premium">
+        <div class="menu-card-img"><img src="images/ube-cream-cheese.jpg" alt="Ube Cream Cheese" loading="lazy" onerror="this.classList.add('broken')"/><div class="img-fallback mc-mix5">💜</div><div class="card-badges"><span class="badge badge-smoke">Baru</span></div></div>
+        <div class="menu-card-body"><div class="menu-card-name">Ube Cream Cheese</div><div class="menu-card-rating"><span class="stars">★★★★★</span><span class="rating-val">4.8</span><span class="review-count">(39)</span></div><div class="menu-card-desc">Cookie ungu cerah dari ubi ungu dengan swirl cream cheese putih yang cantik.</div><div class="menu-card-footer"><div class="menu-price">Rp 33.000 <small>/pcs</small></div><button class="cart-btn" onclick="addToCart('Ube Cream Cheese')">+ Keranjang</button></div></div>
+      </div>
+
+      <div class="menu-card" data-cat="premium">
+        <div class="menu-card-img"><img src="images/black-sesame-mochi.jpg" alt="Black Sesame Mochi" loading="lazy" onerror="this.classList.add('broken')"/><div class="img-fallback mc-smoke">🖤</div></div>
+        <div class="menu-card-body"><div class="menu-card-name">Black Sesame Mochi</div><div class="menu-card-rating"><span class="stars">★★★★☆</span><span class="rating-val">4.5</span><span class="review-count">(57)</span></div><div class="menu-card-desc">Cookie abu-abu gelap dari wijen hitam, chewy, taburan wijen putih di atas.</div><div class="menu-card-footer"><div class="menu-price">Rp 32.000 <small>/pcs</small></div><button class="cart-btn" onclick="addToCart('Black Sesame Mochi')">+ Keranjang</button></div></div>
+      </div>
+
+      <div class="menu-card" data-cat="premium">
+        <div class="menu-card-img"><img src="images/salted-caramel-pretzel.jpg" alt="Salted Caramel Pretzel" loading="lazy" onerror="this.classList.add('broken')"/><div class="img-fallback mc-mix1">🥨</div></div>
+        <div class="menu-card-body"><div class="menu-card-name">Salted Caramel Pretzel</div><div class="menu-card-rating"><span class="stars">★★★★★</span><span class="rating-val">4.9</span><span class="review-count">(66)</span></div><div class="menu-card-desc">Caramel drizzle, mini pretzel, fleur de sel — manis asin yang sempurna.</div><div class="menu-card-footer"><div class="menu-price">Rp 36.000 <small>/pcs</small></div><button class="cart-btn" onclick="addToCart('Salted Caramel Pretzel')">+ Keranjang</button></div></div>
+      </div>
+
+      <div class="menu-card" data-cat="premium">
+        <div class="menu-card-img"><img src="images/red-velvet-crinkle.jpg" alt="Red Velvet Crinkle" loading="lazy" onerror="this.classList.add('broken')"/><div class="img-fallback mc-mix3">❤️</div></div>
+        <div class="menu-card-body"><div class="menu-card-name">Red Velvet Crinkle</div><div class="menu-card-rating"><span class="stars">★★★★★</span><span class="rating-val">4.8</span><span class="review-count">(91)</span></div><div class="menu-card-desc">Cookie merah tua bertekstur crinkle berselimut gula halus putih yang kontras.</div><div class="menu-card-footer"><div class="menu-price">Rp 30.000 <small>/pcs</small></div><button class="cart-btn" onclick="addToCart('Red Velvet Crinkle')">+ Keranjang</button></div></div>
+      </div>
+
+      <div class="menu-card" data-cat="premium">
+        <div class="menu-card-img"><img src="images/tiramisu-espresso.jpg" alt="Tiramisu Espresso" loading="lazy" onerror="this.classList.add('broken')"/><div class="img-fallback mc-smoke">☕</div></div>
+        <div class="menu-card-body"><div class="menu-card-name">Tiramisu Espresso</div><div class="menu-card-rating"><span class="stars">★★★★★</span><span class="rating-val">4.9</span><span class="review-count">(48)</span></div><div class="menu-card-desc">Coklat gelap dengan bubuk cocoa, topped coffee bean untuk pecinta kopi sejati.</div><div class="menu-card-footer"><div class="menu-price">Rp 35.000 <small>/pcs</small></div><button class="cart-btn" onclick="addToCart('Tiramisu Espresso')">+ Keranjang</button></div></div>
+      </div>
+
+      <div class="menu-card" data-cat="premium">
+        <div class="menu-card-img"><img src="images/pandan-coconut.jpg" alt="Pandan Coconut" loading="lazy" onerror="this.classList.add('broken')"/><div class="img-fallback mc-mix6">🌴</div></div>
+        <div class="menu-card-body"><div class="menu-card-name">Pandan Coconut</div><div class="menu-card-rating"><span class="stars">★★★★☆</span><span class="rating-val">4.6</span><span class="review-count">(73)</span></div><div class="menu-card-desc">Cookie hijau pandan alami, lembut, taburan kelapa parut tropical yang harum.</div><div class="menu-card-footer"><div class="menu-price">Rp 28.000 <small>/pcs</small></div><button class="cart-btn" onclick="addToCart('Pandan Coconut')">+ Keranjang</button></div></div>
+      </div>
+
+    </div>
+    <div class="pagination">
+      <button class="page-btn active">1</button>
+      <button class="page-btn">2</button>
+      <button class="page-btn">›</button>
+    </div>
+  </main>
+</div>
+
+<footer>
+  <div class="footer-grid">
+    <div class="footer-brand"><h3>🍪 CrunchCo</h3><p>Artisan cookies dibuat dengan bahan terbaik dan penuh cinta. Dari dapur kami langsung ke momen bahagia Anda.</p></div>
+    <div class="footer-col"><h4>Navigasi</h4><a href="index.html">Beranda</a><a href="menu.html">Menu Lengkap</a><a href="about.html">Tentang Kami</a><a href="tracking.html">Lacak Pesanan</a><a href="order.html">Pemesanan</a></div>
+    <div class="footer-col"><h4>Kontak</h4><a href="#">📍 Jakarta Selatan</a><a href="#">📞 0812-3456-7890</a><a href="#">✉️ hello@crunchco.id</a><a href="#">🕐 Sen–Sab, 08.00–20.00</a></div>
+  </div>
+  <div class="footer-bottom"><p>© 2025 CrunchCo. All rights reserved.</p><p>Made with 🧡 in Jakarta</p></div>
+</footer>
+<div class="toast" id="toast"></div>
+<script>
+function toggleNav(){document.getElementById('navLinks').classList.toggle('open');}
+function addToCart(name){const t=document.getElementById('toast');t.textContent=`🛒 "${name}" ditambahkan!`;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2800);}
+function setFilter(el,cat){
+  document.querySelectorAll('.filter-tab').forEach(b=>b.classList.remove('active'));
+  el.classList.add('active');
+  let count=0;
+  document.querySelectorAll('.menu-card').forEach(c=>{
+    const show=(cat==='semua'||c.dataset.cat===cat);
+    c.style.display=show?'':'none';
+    if(show)count++;
+  });
+  document.getElementById('countShown').textContent=count;
+}
+function filterCards(){
+  const q=document.getElementById('searchInput').value.toLowerCase();
+  let count=0;
+  document.querySelectorAll('.menu-card').forEach(c=>{
+    const name=c.querySelector('.menu-card-name').textContent.toLowerCase();
+    const show=name.includes(q);
+    c.style.display=show?'':'none';
+    if(show)count++;
+  });
+  document.getElementById('countShown').textContent=count;
+}
+</script>
+</body>
+</html>

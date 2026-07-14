@@ -1,0 +1,963 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>Lacak Pesanan — CrunchCo</title>
+  <link rel="stylesheet" href="style.css"/>
+  <style>
+    /* ── PAGE HERO ── */
+    .page-hero {
+      background: linear-gradient(135deg, var(--mirage-900) 0%, var(--mirage-800) 100%);
+      padding: 64px 5vw 72px;
+      position: relative;
+      overflow: hidden;
+    }
+    .page-hero::after {
+      content: '📦';
+      position: absolute;
+      right: 8vw; top: 50%;
+      transform: translateY(-50%);
+      font-size: 16rem;
+      opacity: 0.06;
+      pointer-events: none;
+    }
+    .page-hero-inner { position: relative; z-index: 1; }
+    .breadcrumb { display: flex; align-items: center; gap: 8px; margin-bottom: 18px; font-size: 0.8rem; }
+    .breadcrumb a { color: var(--mirage-300); }
+    .breadcrumb a:hover { color: var(--amber-300); }
+    .breadcrumb .sep { color: var(--mirage-500); }
+    .breadcrumb .cur { color: var(--amber-300); font-weight: 600; }
+    .page-hero h1 { font-size: clamp(2rem, 4vw, 3rem); font-weight: 900; color: white; letter-spacing: -0.04em; margin-bottom: 10px; }
+    .page-hero h1 span { color: var(--amber-300); }
+    .page-hero p { color: var(--mirage-300); font-size: 0.95rem; }
+
+    /* ── SEARCH BOX ── */
+    .search-section {
+      background: white;
+      border-bottom: 1px solid var(--border);
+      padding: 28px 5vw;
+      box-shadow: 0 2px 12px rgba(0,0,0,.06);
+    }
+    .search-box {
+      max-width: 600px;
+      display: flex;
+      gap: 12px;
+    }
+    .search-box-input {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      border: 2px solid var(--border);
+      border-radius: 12px;
+      padding: 0 18px;
+      background: var(--smoke-50);
+      transition: border-color 0.2s;
+    }
+    .search-box-input:focus-within { border-color: var(--amber-400); background: white; }
+    .search-box-input span { font-size: 1.1rem; color: var(--smoke-400); }
+    .search-box-input input {
+      flex: 1;
+      border: none;
+      background: transparent;
+      font-family: 'Montserrat', sans-serif;
+      font-size: 0.9rem;
+      font-weight: 600;
+      padding: 14px 0;
+      outline: none;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--smoke-900);
+    }
+    .search-box-input input::placeholder { text-transform: none; letter-spacing: 0; font-weight: 400; color: var(--smoke-300); }
+    .search-btn {
+      background: var(--mirage-800);
+      color: white;
+      border: none;
+      border-radius: 12px;
+      padding: 14px 28px;
+      font-family: 'Montserrat', sans-serif;
+      font-weight: 700;
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: background 0.2s;
+      white-space: nowrap;
+    }
+    .search-btn:hover { background: var(--mirage-700); }
+    .search-hint {
+      margin-top: 10px;
+      font-size: 0.78rem;
+      color: var(--text-muted);
+    }
+    .search-hint a {
+      color: var(--amber-600);
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .search-hint a:hover { text-decoration: underline; }
+
+    /* ── MAIN LAYOUT ── */
+    .tracking-layout {
+      display: grid;
+      grid-template-columns: 1fr 360px;
+      gap: 32px;
+      padding: 40px 5vw 80px;
+      align-items: start;
+    }
+
+    /* ── ORDER LIST ── */
+    .order-list { display: flex; flex-direction: column; gap: 20px; }
+
+    .order-card {
+      background: white;
+      border-radius: 20px;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+      border-left: 5px solid var(--amber-400);
+      transition: box-shadow 0.2s;
+    }
+    .order-card:hover { box-shadow: var(--shadow-lg); }
+    .order-card.status-baking { border-left-color: #3b82f6; }
+    .order-card.status-packing { border-left-color: #8b5cf6; }
+    .order-card.status-shipped { border-left-color: #10b981; }
+    .order-card.status-done { border-left-color: #22c55e; }
+
+    .order-card-header {
+      padding: 20px 24px 16px;
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+      border-bottom: 1px solid var(--smoke-100);
+    }
+    .order-id-row { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+    .order-id {
+      font-size: 1rem;
+      font-weight: 900;
+      color: var(--mirage-800);
+      letter-spacing: -0.01em;
+    }
+    .order-date { font-size: 0.78rem; color: var(--text-muted); font-weight: 500; }
+    .order-card-header-right { display: flex; flex-direction: column; align-items: flex-end; gap: 6px; }
+    .order-total { font-size: 1.1rem; font-weight: 900; color: var(--amber-700); }
+    .order-total small { font-size: 0.72rem; color: var(--text-muted); font-weight: 500; }
+
+    /* ── ITEMS IN ORDER ── */
+    .order-items {
+      padding: 16px 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      border-bottom: 1px solid var(--smoke-100);
+    }
+    .order-item {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+    .oi-img {
+      width: 52px;
+      height: 52px;
+      border-radius: 10px;
+      overflow: hidden;
+      flex-shrink: 0;
+      background: var(--amber-100);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.6rem;
+    }
+    .oi-img img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    .oi-img img.broken { display: none; }
+    .oi-img img.broken ~ .oi-emoji { display: flex; }
+    .oi-emoji { display: none; width: 100%; height: 100%; align-items: center; justify-content: center; font-size: 1.6rem; }
+    .oi-info { flex: 1; }
+    .oi-name { font-size: 0.85rem; font-weight: 700; color: var(--smoke-900); }
+    .oi-qty { font-size: 0.75rem; color: var(--text-muted); margin-top: 2px; }
+    .oi-price { font-size: 0.9rem; font-weight: 800; color: var(--amber-700); white-space: nowrap; }
+
+    /* ── PROGRESS TRACKER ── */
+    .order-progress {
+      padding: 20px 24px;
+      border-bottom: 1px solid var(--smoke-100);
+    }
+    .progress-label {
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--smoke-400);
+      margin-bottom: 16px;
+    }
+    .progress-steps {
+      display: flex;
+      align-items: flex-start;
+      gap: 0;
+      position: relative;
+    }
+    .ps-item {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      position: relative;
+    }
+    .ps-item:not(:last-child)::after {
+      content: '';
+      position: absolute;
+      top: 14px;
+      left: calc(50% + 14px);
+      right: calc(-50% + 14px);
+      height: 2px;
+      background: var(--smoke-200);
+      z-index: 0;
+    }
+    .ps-item.done:not(:last-child)::after { background: var(--amber-400); }
+    .ps-item.active:not(:last-child)::after { background: var(--smoke-200); }
+
+    .ps-dot {
+      width: 28px; height: 28px;
+      border-radius: 50%;
+      border: 2px solid var(--smoke-300);
+      background: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.75rem;
+      color: var(--smoke-400);
+      z-index: 1;
+      transition: all 0.3s;
+      flex-shrink: 0;
+    }
+    .ps-item.done .ps-dot {
+      background: var(--amber-400);
+      border-color: var(--amber-400);
+      color: white;
+      font-size: 0.65rem;
+    }
+    .ps-item.active .ps-dot {
+      background: var(--mirage-800);
+      border-color: var(--mirage-800);
+      color: white;
+      box-shadow: 0 0 0 4px rgba(22, 34, 70, 0.12);
+      animation: pulse-dot 2s infinite;
+    }
+    @keyframes pulse-dot {
+      0%, 100% { box-shadow: 0 0 0 4px rgba(22,34,70,0.12); }
+      50% { box-shadow: 0 0 0 8px rgba(22,34,70,0.06); }
+    }
+    .ps-label {
+      font-size: 0.65rem;
+      font-weight: 700;
+      color: var(--smoke-400);
+      margin-top: 8px;
+      max-width: 60px;
+    }
+    .ps-item.active .ps-label { color: var(--mirage-700); }
+    .ps-item.done .ps-label { color: var(--amber-700); }
+    .ps-time {
+      font-size: 0.6rem;
+      color: var(--smoke-300);
+      margin-top: 2px;
+    }
+    .ps-item.done .ps-time { color: var(--amber-500); }
+    .ps-item.active .ps-time { color: var(--mirage-400); }
+
+    /* ── ORDER CARD FOOTER ── */
+    .order-card-footer {
+      padding: 14px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 10px;
+      background: var(--smoke-50);
+    }
+    .delivery-info { display: flex; align-items: center; gap: 8px; }
+    .delivery-info span { font-size: 0.78rem; color: var(--smoke-600); font-weight: 500; }
+    .delivery-info strong { color: var(--smoke-900); }
+    .order-actions { display: flex; gap: 8px; }
+    .action-btn {
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-size: 0.78rem;
+      font-weight: 700;
+      font-family: 'Montserrat', sans-serif;
+      cursor: pointer;
+      border: none;
+      transition: all 0.2s;
+    }
+    .btn-reorder { background: var(--amber-500); color: var(--smoke-900); }
+    .btn-reorder:hover { background: var(--amber-400); }
+    .btn-detail { background: white; color: var(--mirage-700); border: 2px solid var(--mirage-200); }
+    .btn-detail:hover { border-color: var(--mirage-500); }
+    .btn-review { background: white; color: var(--smoke-600); border: 2px solid var(--smoke-200); }
+    .btn-review:hover { border-color: var(--smoke-400); }
+    .btn-cancel { background: white; color: #ef4444; border: 2px solid #fecaca; }
+    .btn-cancel:hover { background: #fee2e2; }
+
+    /* ── EMPTY STATE ── */
+    .empty-state {
+      text-align: center;
+      padding: 80px 32px;
+      background: white;
+      border-radius: 20px;
+      box-shadow: var(--shadow);
+    }
+    .empty-icon { font-size: 5rem; margin-bottom: 20px; }
+    .empty-title { font-size: 1.2rem; font-weight: 800; color: var(--smoke-900); margin-bottom: 8px; }
+    .empty-sub { font-size: 0.9rem; color: var(--text-muted); margin-bottom: 24px; }
+
+    /* ── SIDEBAR ── */
+    .tracking-sidebar { display: flex; flex-direction: column; gap: 20px; }
+
+    .sidebar-card {
+      background: white;
+      border-radius: 18px;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+    .sidebar-card-header {
+      padding: 18px 20px 14px;
+      border-bottom: 1px solid var(--smoke-100);
+      font-size: 0.85rem;
+      font-weight: 800;
+      color: var(--smoke-900);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .sidebar-card-body { padding: 18px 20px; }
+
+    /* SUMMARY STATS */
+    .stat-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .stat-box {
+      background: var(--smoke-50);
+      border-radius: 12px;
+      padding: 14px;
+      text-align: center;
+    }
+    .stat-box .num { font-size: 1.5rem; font-weight: 900; color: var(--mirage-800); letter-spacing: -0.03em; }
+    .stat-box .num span { color: var(--amber-600); }
+    .stat-box .lbl { font-size: 0.7rem; color: var(--text-muted); font-weight: 600; margin-top: 2px; }
+    .stat-box.highlight { background: var(--mirage-800); }
+    .stat-box.highlight .num { color: var(--amber-300); }
+    .stat-box.highlight .lbl { color: var(--mirage-300); }
+
+    /* QUICK INFO */
+    .info-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--smoke-100);
+    }
+    .info-row:last-child { border-bottom: none; padding-bottom: 0; }
+    .info-icon { font-size: 1.2rem; flex-shrink: 0; width: 32px; text-align: center; }
+    .info-text .it-label { font-size: 0.7rem; color: var(--text-muted); font-weight: 600; }
+    .info-text .it-val { font-size: 0.85rem; font-weight: 700; color: var(--smoke-900); }
+
+    /* PROMO */
+    .promo-card {
+      background: linear-gradient(135deg, var(--amber-500), var(--amber-700));
+      border-radius: 18px;
+      padding: 24px 20px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .promo-card::before { content: '🎁'; position: absolute; right: -10px; top: -10px; font-size: 5rem; opacity: 0.15; }
+    .promo-card h4 { font-size: 0.9rem; font-weight: 800; color: white; margin-bottom: 6px; }
+    .promo-card p { font-size: 0.78rem; color: rgba(255,255,255,.85); margin-bottom: 16px; line-height: 1.5; }
+    .promo-code {
+      background: white;
+      border-radius: 8px;
+      padding: 10px 16px;
+      font-size: 1rem;
+      font-weight: 900;
+      color: var(--amber-700);
+      letter-spacing: 0.1em;
+      margin-bottom: 12px;
+    }
+    .promo-copy {
+      background: var(--mirage-800);
+      color: var(--amber-200);
+      border: none;
+      border-radius: 8px;
+      padding: 8px 20px;
+      font-family: 'Montserrat', sans-serif;
+      font-size: 0.78rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .promo-copy:hover { background: var(--mirage-700); }
+
+    /* FILTER TABS */
+    .order-filter {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 24px;
+    }
+    .otab {
+      padding: 8px 18px;
+      border-radius: 20px;
+      font-size: 0.78rem;
+      font-weight: 700;
+      cursor: pointer;
+      border: 2px solid var(--border);
+      background: white;
+      color: var(--smoke-600);
+      font-family: 'Montserrat', sans-serif;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .otab:hover { border-color: var(--amber-400); color: var(--amber-700); }
+    .otab.active { background: var(--mirage-800); border-color: var(--mirage-800); color: white; }
+    .otab .count {
+      background: var(--amber-400);
+      color: var(--smoke-900);
+      width: 18px; height: 18px;
+      border-radius: 50%;
+      font-size: 0.65rem;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .otab.active .count { background: rgba(255,255,255,0.25); color: white; }
+
+    /* DETAIL MODAL */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(13,21,48,.6);
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s;
+      backdrop-filter: blur(4px);
+      padding: 20px;
+    }
+    .modal-overlay.show { opacity: 1; pointer-events: all; }
+    .modal-box {
+      background: white;
+      border-radius: 24px;
+      max-width: 520px;
+      width: 100%;
+      max-height: 90vh;
+      overflow-y: auto;
+      box-shadow: 0 24px 64px rgba(0,0,0,.25);
+      transform: scale(0.92) translateY(20px);
+      transition: transform 0.3s cubic-bezier(.34,1.56,.64,1);
+    }
+    .modal-overlay.show .modal-box { transform: scale(1) translateY(0); }
+    .modal-head {
+      background: linear-gradient(135deg, var(--mirage-900), var(--mirage-800));
+      padding: 24px 28px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .modal-head h3 { font-size: 1rem; font-weight: 800; color: white; }
+    .modal-head p { font-size: 0.78rem; color: var(--mirage-300); margin-top: 2px; }
+    .modal-close {
+      width: 32px; height: 32px;
+      border-radius: 8px;
+      background: rgba(255,255,255,.1);
+      border: none;
+      color: white;
+      font-size: 1rem;
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      transition: background 0.2s;
+      flex-shrink: 0;
+    }
+    .modal-close:hover { background: rgba(255,255,255,.2); }
+    .modal-body { padding: 24px 28px; }
+    .modal-section { margin-bottom: 24px; }
+    .modal-section h4 { font-size: 0.72rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--amber-600); margin-bottom: 12px; }
+    .modal-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid var(--smoke-100); font-size: 0.85rem; }
+    .modal-row:last-child { border-bottom: none; }
+    .modal-row span:first-child { color: var(--text-muted); }
+    .modal-row span:last-child { font-weight: 700; color: var(--smoke-900); }
+    .modal-row.total span:last-child { color: var(--amber-700); font-size: 1rem; }
+
+    @media (max-width: 900px) {
+      .tracking-layout { grid-template-columns: 1fr; }
+      .tracking-sidebar { display: grid; grid-template-columns: 1fr 1fr; }
+    }
+    @media (max-width: 600px) {
+      .tracking-sidebar { grid-template-columns: 1fr; }
+      .order-card-header { flex-direction: column; }
+      .order-card-header-right { align-items: flex-start; }
+    }
+  </style>
+</head>
+<body>
+
+<nav class="navbar">
+  <a href="index.html" class="nav-logo"><span class="icon">🍪</span> CrunchCo</a>
+  <ul class="nav-links" id="navLinks">
+    <li><a href="index.html">Beranda</a></li>
+    <li><a href="menu.html">Menu</a></li>
+    <li><a href="about.html">Tentang Kami</a></li>
+    <li><a href="tracking.html" class="active nav-track">📦 Pesananku</a></li>
+    <li><a href="order.html" class="nav-cta">Pesan Sekarang</a></li>
+  </ul>
+  <div class="nav-hamburger" onclick="toggleNav()"><span></span><span></span><span></span></div>
+</nav>
+
+<div class="page-hero">
+  <div class="page-hero-inner">
+    <div class="breadcrumb">
+      <a href="index.html">Beranda</a><span class="sep">›</span><span class="cur">Lacak Pesanan</span>
+    </div>
+    <h1>Pesanan <span>Saya</span></h1>
+    <p>Pantau status, riwayat, dan detail semua pesananmu di sini</p>
+  </div>
+</div>
+
+<!-- SEARCH SECTION -->
+<div class="search-section">
+  <div class="search-box">
+    <div class="search-box-input">
+      <span>🔍</span>
+      <input type="text" id="searchOrder" placeholder="Masukkan nomor pesanan, mis. CCO-2025-0042" />
+    </div>
+    <button class="search-btn" onclick="searchOrder()">Cari Pesanan</button>
+  </div>
+  <div class="search-hint">
+    Ketik nomor pesanan dari email/WhatsApp konfirmasi kamu
+  </div>
+</div>
+
+<!-- MAIN LAYOUT -->
+<div class="tracking-layout">
+
+  <!-- LEFT: ORDER LIST -->
+  <div>
+    <!-- FILTER TABS -->
+    <div class="order-filter" id="filterBar">
+      <button class="otab active" onclick="filterOrders(this,'all')">Semua <span class="count" id="cntAll">0</span></button>
+      <button class="otab" onclick="filterOrders(this,'active')">Aktif <span class="count" id="cntActive">0</span></button>
+      <button class="otab" onclick="filterOrders(this,'done')">Selesai <span class="count" id="cntDone">0</span></button>
+    </div>
+
+    <div class="order-list" id="orderList">
+    </div><!-- /order-list -->
+  </div>
+
+  <!-- RIGHT SIDEBAR -->
+  <aside class="tracking-sidebar">
+
+    <!-- STATS -->
+    <div class="sidebar-card">
+      <div class="sidebar-card-header">📊 Ringkasan Belanja</div>
+      <div class="sidebar-card-body">
+        <div class="stat-row">
+          <div class="stat-box"><div class="num" id="statTotal">0</div><div class="lbl">Total Pesanan</div></div>
+          <div class="stat-box highlight"><div class="num" style="font-size:1.1rem;" id="statBelanja">Rp<span>0</span></div><div class="lbl">Total Belanja</div></div>
+          <div class="stat-box"><div class="num" id="statAktif">0</div><div class="lbl">Sedang Aktif</div></div>
+          <div class="stat-box"><div class="num">4.9<span>⭐</span></div><div class="lbl">Avg Rating</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- INFO KONTAK -->
+    <div class="sidebar-card">
+      <div class="sidebar-card-header">👤 Info Pemesan</div>
+      <div class="sidebar-card-body">
+        <div class="info-row"><div class="info-icon">👤</div><div class="info-text"><div class="it-label">Nama</div><div class="it-val">Pelanggan CrunchCo</div></div></div>
+        <div class="info-row"><div class="info-icon">📱</div><div class="info-text"><div class="it-label">WhatsApp</div><div class="it-val">0812-xxxx-xxxx</div></div></div>
+        <div class="info-row"><div class="info-icon">📍</div><div class="info-text"><div class="it-label">Kota</div><div class="it-val">Jakarta Selatan</div></div></div>
+        <div class="info-row"><div class="info-icon">🏷️</div><div class="info-text"><div class="it-label">Member sejak</div><div class="it-val">April 2025</div></div></div>
+      </div>
+    </div>
+
+    <!-- BUTUH BANTUAN -->
+    <div class="sidebar-card">
+      <div class="sidebar-card-header">🆘 Butuh Bantuan?</div>
+      <div class="sidebar-card-body">
+        <div class="info-row"><div class="info-icon">💬</div><div class="info-text"><div class="it-label">WhatsApp CS</div><div class="it-val" style="color:var(--amber-600);cursor:pointer;">0812-3456-7890</div></div></div>
+        <div class="info-row"><div class="info-icon">✉️</div><div class="info-text"><div class="it-label">Email</div><div class="it-val" style="color:var(--amber-600);">hello@crunchco.id</div></div></div>
+        <div class="info-row"><div class="info-icon">🕐</div><div class="info-text"><div class="it-label">Jam Operasional</div><div class="it-val">Sen–Sab, 08.00–20.00</div></div></div>
+        <div style="margin-top:14px;">
+          <a href="order.html" class="btn btn-primary" style="width:100%;justify-content:center;font-size:0.85rem;padding:12px;">+ Pesan Lagi</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- PROMO -->
+    <div class="promo-card">
+      <h4>🎉 Kode Spesial Untukmu!</h4>
+      <p>Karena sudah belanja 4x, kamu dapat diskon eksklusif untuk pesanan berikutnya!</p>
+      <div class="promo-code">LOYAL20</div>
+      <button class="promo-copy" onclick="copyPromo()">📋 Salin Kode</button>
+    </div>
+
+  </aside>
+</div><!-- /tracking-layout -->
+
+<!-- DETAIL MODAL -->
+<div class="modal-overlay" id="modalOverlay" onclick="closeModal(event)">
+  <div class="modal-box">
+    <div class="modal-head">
+      <div>
+        <h3 id="modalOrderId">#CCO-2025-0042</h3>
+        <p id="modalOrderDate">Sabtu, 23 Mei 2025 · 09:14 WIB</p>
+      </div>
+      <button class="modal-close" onclick="closeModalBtn()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="modal-section">
+        <h4>Status</h4>
+        <div class="modal-row"><span>Status Pesanan</span><span id="modalStatus">—</span></div>
+      </div>
+      <div class="modal-section">
+        <h4>Detail Produk</h4>
+        <div id="modalItems"></div>
+      </div>
+      <div class="modal-section">
+        <h4>Pengiriman</h4>
+        <div class="modal-row"><span>Metode</span><span id="modalDelivery">—</span></div>
+        <div class="modal-row"><span>Ongkos Kirim</span><span id="modalOngkir">—</span></div>
+      </div>
+      <div class="modal-section">
+        <h4>Pembayaran</h4>
+        <div class="modal-row"><span>Subtotal Produk</span><span id="modalSubtotal">—</span></div>
+        <div class="modal-row"><span>Ongkos Kirim</span><span id="modalOngkir2">—</span></div>
+        <div class="modal-row"><span>Diskon</span><span id="modalDiscount" style="color:#22c55e;">—</span></div>
+        <div class="modal-row total"><span><strong>Total Bayar</strong></span><span id="modalTotal">—</span></div>
+        <div class="modal-row"><span>Metode Bayar</span><span id="modalPayment">—</span></div>
+        <div class="modal-row"><span>Status Bayar</span><span style="color:#22c55e;font-weight:800;">✅ Lunas</span></div>
+      </div>
+      <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:4px;">
+        <button class="action-btn btn-reorder" onclick="reorder()">🔄 Pesan Lagi</button>
+        <button class="action-btn btn-detail" onclick="closeModalBtn()">Tutup</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <div class="footer-grid">
+    <div class="footer-brand"><h3>🍪 CrunchCo</h3><p>Artisan cookies dibuat dengan bahan terbaik dan penuh cinta. Dari dapur kami langsung ke momen bahagia Anda.</p></div>
+    <div class="footer-col"><h4>Navigasi</h4><a href="index.html">Beranda</a><a href="menu.html">Menu Lengkap</a><a href="about.html">Tentang Kami</a><a href="tracking.html">Lacak Pesanan</a><a href="order.html">Pemesanan</a></div>
+    <div class="footer-col"><h4>Kontak</h4><a href="#">📍 Jakarta Selatan</a><a href="#">📞 0812-3456-7890</a><a href="#">✉️ hello@crunchco.id</a><a href="#">🕐 Sen–Sab, 08.00–20.00</a></div>
+  </div>
+  <div class="footer-bottom"><p>© 2025 CrunchCo. All rights reserved.</p><p>Made with 🧡 in Jakarta</p></div>
+</footer>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ═══════════════════════════════════════════════
+   CRUNCHCO TRACKING — semua data dari localStorage
+   ═══════════════════════════════════════════════ */
+
+function toggleNav(){document.getElementById('navLinks').classList.toggle('open');}
+
+function showToast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2800);
+}
+
+/* ── HELPERS ── */
+const fmt = n => 'Rp '+Number(n).toLocaleString('id');
+
+const STATUS_META = {
+  pending:  {label:'⏳ Menunggu Konfirmasi', pill:'status-pending',  dsGroup:'active', steps:[0,-1,-1,-1,-1]},
+  baking:   {label:'🔥 Sedang Dipanggang',   pill:'status-baking',   dsGroup:'active', steps:[1, 0,-1,-1,-1]},
+  packing:  {label:'📦 Sedang Dikemas',       pill:'status-packing',  dsGroup:'active', steps:[1, 1, 0,-1,-1]},
+  shipped:  {label:'🚚 Dalam Pengiriman',     pill:'status-shipped',  dsGroup:'active', steps:[1, 1, 1, 0,-1]},
+  done:     {label:'✅ Selesai',              pill:'status-done',     dsGroup:'done',   steps:[1, 1, 1, 1, 1]},
+  cancelled:{label:'❌ Dibatalkan',           pill:'status-cancelled', dsGroup:'done',  steps:[-1,-1,-1,-1,-1]},
+};
+const STEP_LABELS = ['Diterima','Dipanggang','Dikemas','Dikirim','Selesai'];
+const STEP_ICONS  = ['📋','🔥','📦','🚚','✅'];
+
+function buildProgressSteps(steps){
+  return steps.map((s,i)=>{
+    const cls = s===1?'done': s===0?'active':'';
+    const dot  = s===1?'✓': s===0?STEP_ICONS[i]: String(i+1);
+    return `<div class="ps-item ${cls}">
+      <div class="ps-dot">${dot}</div>
+      <div class="ps-label">${STEP_LABELS[i]}</div>
+    </div>`;
+  }).join('');
+}
+
+function buildItemsHTML(items){
+  return items.map(it=>`
+    <div class="order-item">
+      <div class="oi-img">
+        <img src="${it.img||''}" alt="${it.name}" loading="lazy" onerror="this.classList.add('broken')"/>
+        <div class="oi-emoji">${it.emoji||'🍪'}</div>
+      </div>
+      <div class="oi-info">
+        <div class="oi-name">${it.name}</div>
+        <div class="oi-qty">${it.qty} pcs × ${fmt(it.price)}</div>
+      </div>
+      <div class="oi-price">${fmt(it.subtotal)}</div>
+    </div>`).join('');
+}
+
+function buildOrderCard(o){
+  const meta = STATUS_META[o.status] || STATUS_META.baking;
+  const isActive = meta.dsGroup === 'active';
+  const totalItems = o.items.reduce((s,i)=>s+i.qty,0);
+  const cancelBtn = isActive
+    ? `<button class="action-btn btn-cancel" onclick="cancelOrder('${o.id}')">Batalkan</button>` : '';
+  const reviewBtn = !isActive && o.status==='done'
+    ? `<button class="action-btn btn-review" onclick="showToast('📝 Halaman ulasan segera hadir!')">Beri Ulasan</button>` : '';
+
+  return `
+  <div class="order-card ${meta.pill}" data-status="${meta.dsGroup}" data-id="${o.id}">
+    <div class="order-card-header">
+      <div>
+        <div class="order-id-row">
+          <div class="order-id">#${o.id}</div>
+          <span class="status-pill ${meta.pill}">${meta.label}</span>
+        </div>
+        <div class="order-date">Dipesan: ${o.date}</div>
+      </div>
+      <div class="order-card-header-right">
+        <div class="order-total">${fmt(o.total)}</div>
+        <div style="font-size:0.72rem;color:var(--text-muted);">${totalItems} item · ${o.delivery}</div>
+      </div>
+    </div>
+
+    <div class="order-items">
+      ${buildItemsHTML(o.items.slice(0,2))}
+      ${o.items.length>2?`<div class="order-item" style="opacity:.55;font-style:italic;">
+        <div class="oi-img" style="font-size:0.75rem;color:var(--text-muted);background:var(--smoke-100);border-radius:10px;display:flex;align-items:center;justify-content:center;">+${o.items.length-2}</div>
+        <div class="oi-info"><div class="oi-name" style="color:var(--text-muted);">dan ${o.items.length-2} item lainnya...</div></div>
+      </div>`:''}
+    </div>
+
+    <div class="order-progress">
+      <div class="progress-label">Status Pesanan</div>
+      <div class="progress-steps">${buildProgressSteps(meta.steps)}</div>
+    </div>
+
+    <div class="order-card-footer">
+      <div class="delivery-info">
+        <span>📦</span>
+        <span>${o.delivery} · <strong>${fmt(o.ongkir)==='Rp 0'?'Gratis':fmt(o.ongkir)}</strong></span>
+      </div>
+      <div class="order-actions">
+        <button class="action-btn btn-detail" onclick="openModal('${o.id}')">Detail</button>
+        <button class="action-btn btn-reorder" onclick="reorder()">🔄 Pesan Lagi</button>
+        ${reviewBtn}
+        ${cancelBtn}
+      </div>
+    </div>
+  </div>`;
+}
+
+/* ── LOAD & RENDER ── */
+let allOrders = [];
+let currentFilter = 'all';
+let currentModal = null;
+
+function loadOrders(){
+  allOrders = JSON.parse(localStorage.getItem('crunchco_orders') || '[]');
+  renderOrders();
+  updateSidebar();
+}
+
+function renderOrders(){
+  const list = document.getElementById('orderList');
+  const filtered = currentFilter==='all'
+    ? allOrders
+    : allOrders.filter(o=>(STATUS_META[o.status]||{}).dsGroup===currentFilter);
+
+  if(filtered.length===0){
+    list.innerHTML = `
+      <div class="empty-state">
+        <div class="empty-icon">${allOrders.length===0?'🍪':'📭'}</div>
+        <div class="empty-title">${allOrders.length===0?'Belum Ada Pesanan':'Tidak Ada Pesanan di Kategori Ini'}</div>
+        <div class="empty-sub">${allOrders.length===0?'Yuk, pesan cookie favoritmu sekarang!':'Coba filter lain untuk melihat pesanan.'}</div>
+        ${allOrders.length===0?'<a href="order.html" class="btn btn-primary" style="margin-top:4px;">🍪 Pesan Sekarang</a>':''}
+      </div>`;
+  } else {
+    list.innerHTML = filtered.map(buildOrderCard).join('');
+  }
+
+  /* update tab counts */
+  const active = allOrders.filter(o=>(STATUS_META[o.status]||{}).dsGroup==='active').length;
+  const done   = allOrders.filter(o=>(STATUS_META[o.status]||{}).dsGroup==='done').length;
+  document.getElementById('cntAll').textContent    = allOrders.length;
+  document.getElementById('cntActive').textContent = active;
+  document.getElementById('cntDone').textContent   = done;
+}
+
+function updateSidebar(){
+  const total = allOrders.length;
+  const totalBelanja = allOrders.reduce((s,o)=>s+o.total,0);
+  const aktif = allOrders.filter(o=>(STATUS_META[o.status]||{}).dsGroup==='active').length;
+
+  const el = id => document.getElementById(id);
+  if(el('statTotal'))   el('statTotal').textContent   = total;
+  if(el('statAktif'))   el('statAktif').textContent   = aktif;
+  if(el('statBelanja')){
+    const rb = Math.round(totalBelanja/1000);
+    el('statBelanja').innerHTML = rb>=1000
+      ? `Rp<span>${(rb/1000).toFixed(1)}jt</span>`
+      : `Rp<span>${rb}rb</span>`;
+  }
+}
+
+/* ── FILTER ── */
+function filterOrders(el, type){
+  document.querySelectorAll('.otab').forEach(b=>b.classList.remove('active'));
+  el.classList.add('active');
+  currentFilter = type;
+  renderOrders();
+}
+
+/* ── SEARCH ── */
+function searchOrder(){
+  const q = document.getElementById('searchOrder').value.trim().toUpperCase().replace('#','');
+  if(!q){showToast('⚠️ Masukkan nomor pesanan!');return;}
+  const found = allOrders.find(o=>o.id.toUpperCase()===q);
+  if(found){
+    /* reset filter ke all supaya card terlihat */
+    currentFilter='all';
+    document.querySelectorAll('.otab').forEach(b=>b.classList.remove('active'));
+    document.querySelector('.otab').classList.add('active');
+    renderOrders();
+    setTimeout(()=>{
+      const card = document.querySelector(`[data-id="${found.id}"]`);
+      if(card){card.scrollIntoView({behavior:'smooth',block:'center'});card.style.outline='3px solid var(--amber-400)';setTimeout(()=>card.style.outline='',2500);}
+    },100);
+  } else {
+    showToast('❌ Pesanan tidak ditemukan');
+  }
+}
+
+/* ── CANCEL ORDER ── */
+function cancelOrder(id){
+  if(!confirm('Yakin ingin membatalkan pesanan #'+id+'?')) return;
+  const idx = allOrders.findIndex(o=>o.id===id);
+  if(idx===-1) return;
+  allOrders[idx].status='cancelled';
+  localStorage.setItem('crunchco_orders', JSON.stringify(allOrders));
+  renderOrders();
+  updateSidebar();
+  showToast('🚫 Pesanan #'+id+' dibatalkan');
+}
+
+/* ── DETAIL MODAL ── */
+function openModal(id){
+  const o = allOrders.find(x=>x.id===id);
+  if(!o) return;
+  currentModal = o;
+  const meta = STATUS_META[o.status]||STATUS_META.baking;
+
+  document.getElementById('modalOrderId').textContent   = '#'+o.id;
+  document.getElementById('modalOrderDate').textContent = o.date;
+
+  /* render detail items */
+  document.getElementById('modalItems').innerHTML = o.items.map(it=>
+    `<div class="modal-row"><span>${it.name} × ${it.qty}</span><span>${fmt(it.subtotal)}</span></div>`
+  ).join('');
+
+  document.getElementById('modalDelivery').textContent  = o.delivery;
+  document.getElementById('modalOngkir').textContent    = o.ongkir===0?'Gratis':fmt(o.ongkir);
+  if(document.getElementById('modalOngkir2')) document.getElementById('modalOngkir2').textContent = o.ongkir===0?'Gratis':fmt(o.ongkir);
+  document.getElementById('modalSubtotal').textContent  = fmt(o.subtotal);
+  document.getElementById('modalDiscount').textContent  = o.discount>0?'− '+fmt(o.discount):'Rp 0';
+  document.getElementById('modalTotal').textContent     = fmt(o.total);
+  document.getElementById('modalPayment').textContent   = o.payment;
+  document.getElementById('modalStatus').innerHTML      = `<span class="status-pill ${meta.pill}">${meta.label}</span>`;
+
+  document.getElementById('modalOverlay').classList.add('show');
+}
+function closeModal(e){if(e.target===document.getElementById('modalOverlay'))closeModalBtn();}
+function closeModalBtn(){document.getElementById('modalOverlay').classList.remove('show');}
+
+function copyPromo(){
+  navigator.clipboard.writeText('LOYAL20').catch(()=>{});
+  showToast('📋 Kode LOYAL20 berhasil disalin!');
+}
+function reorder(){
+  showToast('🛒 Mengarahkan ke halaman pesanan...');
+  setTimeout(()=>window.location='order.html',1200);
+}
+
+/* ── INIT ── */
+loadOrders();
+</script>
+
+function showToast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg;
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2800);
+}
+
+function filterOrders(el,type){
+  document.querySelectorAll('.otab').forEach(b=>b.classList.remove('active'));
+  el.classList.add('active');
+  document.querySelectorAll('.order-card').forEach(c=>{
+    if(type==='all') c.style.display='';
+    else c.style.display=c.dataset.status===type?'':'none';
+  });
+}
+
+function searchOrder(){
+  const q=document.getElementById('searchOrder').value.trim().toUpperCase();
+  if(!q){showToast('⚠️ Masukkan nomor pesanan terlebih dahulu!');return;}
+  const cards=document.querySelectorAll('.order-card');
+  let found=false;
+  cards.forEach(c=>{
+    const id=c.querySelector('.order-id').textContent.replace('#','');
+    if(id===q){c.scrollIntoView({behavior:'smooth',block:'center'});c.style.outline='3px solid var(--amber-400)';setTimeout(()=>c.style.outline='',2000);found=true;}
+  });
+  if(!found) showToast('❌ Pesanan '+q+' tidak ditemukan');
+}
+
+function fillDemo(id){
+  document.getElementById('searchOrder').value=id;
+  searchOrder();
+}
+
+const modalData={
+  'CCO-2025-0042':{date:'Sabtu, 23 Mei 2025 · 09:14 WIB'},
+  'CCO-2025-0031':{date:'Kamis, 21 Mei 2025 · 14:22 WIB'},
+  'CCO-2025-0018':{date:'Senin, 5 Mei 2025 · 10:05 WIB'},
+  'CCO-2025-0007':{date:'Rabu, 16 Apr 2025 · 13:30 WIB'},
+};
+function openModal(id){
+  const d=modalData[id]||{date:'-'};
+  document.getElementById('modalOrderId').textContent='#'+id;
+  document.getElementById('modalOrderDate').textContent=d.date;
+  document.getElementById('modalOverlay').classList.add('show');
+}
+function closeModal(e){if(e.target===document.getElementById('modalOverlay'))closeModalBtn();}
+function closeModalBtn(){document.getElementById('modalOverlay').classList.remove('show');}
+
+function copyPromo(){
+  navigator.clipboard.writeText('LOYAL20').catch(()=>{});
+  showToast('📋 Kode LOYAL20 berhasil disalin!');
+}
+function reorder(){
+  showToast('🛒 Mengarahkan ke halaman pesanan...');
+  setTimeout(()=>window.location='order.html',1200);
+}
+</script>
+</body>
+</html>

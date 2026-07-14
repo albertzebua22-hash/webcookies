@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>CrunchCo — Artisan Cookies</title>
+  <link rel="stylesheet" href="style.css"/>
+  <style>
+    .hero{min-height:calc(100vh - 68px);display:grid;grid-template-columns:1fr 1fr;align-items:center;gap:60px;padding:80px 5vw;background:radial-gradient(ellipse 60% 60% at 80% 40%,rgba(245,158,11,.12) 0%,transparent 60%),radial-gradient(ellipse 40% 50% at 10% 80%,rgba(45,68,128,.10) 0%,transparent 60%),var(--amber-50);position:relative;overflow:hidden;}
+    .hero::before{content:'';position:absolute;inset:0;background-image:url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none'%3E%3Ccircle cx='30' cy='30' r='4' fill='%23f59e0b' fill-opacity='0.05'/%3E%3C/g%3E%3C/svg%3E");pointer-events:none;}
+    .hero-content{position:relative;z-index:1;}
+    .hero-eyebrow{display:inline-flex;align-items:center;gap:8px;background:var(--mirage-800);color:var(--amber-300);padding:6px 16px;border-radius:20px;font-size:0.75rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;margin-bottom:20px;}
+    .hero-eyebrow .dot{width:6px;height:6px;background:var(--amber-400);border-radius:50%;animation:pulse 1.8s infinite;}
+    @keyframes pulse{0%,100%{opacity:1;transform:scale(1);}50%{opacity:.5;transform:scale(1.4);}}
+    .hero-title{font-size:clamp(2.4rem,5vw,4rem);font-weight:900;line-height:1.1;letter-spacing:-0.04em;color:var(--smoke-900);margin-bottom:20px;}
+    .hero-title .highlight{color:var(--amber-600);position:relative;}
+    .hero-title .highlight::after{content:'';position:absolute;bottom:2px;left:0;right:0;height:4px;background:linear-gradient(90deg,var(--amber-400),var(--amber-600));border-radius:2px;transform:scaleX(0);transform-origin:left;animation:uline 1s .6s forwards;}
+    @keyframes uline{to{transform:scaleX(1);}}
+    .hero-desc{font-size:1.05rem;color:var(--text-secondary);max-width:460px;margin-bottom:36px;line-height:1.8;}
+    .hero-actions{display:flex;gap:14px;flex-wrap:wrap;}
+    .hero-stats{display:flex;gap:32px;margin-top:48px;padding-top:32px;border-top:1px solid var(--smoke-200);}
+    .stat-num{font-size:1.8rem;font-weight:900;color:var(--mirage-700);letter-spacing:-0.04em;}
+    .stat-num span{color:var(--amber-600);}
+    .stat-label{font-size:0.78rem;color:var(--text-muted);font-weight:500;margin-top:2px;}
+    .hero-visual{position:relative;z-index:1;display:flex;justify-content:center;align-items:center;}
+    .hero-cookie-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;width:100%;max-width:460px;}
+    .hero-cookie-card{background:white;border-radius:20px;overflow:hidden;box-shadow:var(--shadow);animation:floatUp .7s ease both;transition:transform .25s;}
+    .hero-cookie-card:hover{transform:translateY(-6px) rotate(-2deg);}
+    .hero-cookie-card:nth-child(1){animation-delay:.1s;}
+    .hero-cookie-card:nth-child(2){animation-delay:.2s;margin-top:24px;}
+    .hero-cookie-card:nth-child(3){animation-delay:.3s;}
+    .hero-cookie-card:nth-child(4){animation-delay:.4s;margin-top:-24px;}
+    .hero-cookie-card.featured{background:linear-gradient(135deg,var(--mirage-800),var(--mirage-700));}
+    .hero-cookie-card.featured .cookie-name{color:var(--amber-200);}
+    .hero-cookie-card.featured .cookie-price{color:var(--amber-300);}
+    @keyframes floatUp{from{opacity:0;transform:translateY(30px);}to{opacity:1;transform:translateY(0);}}
+    .hcc-img{height:110px;overflow:hidden;}
+    .hcc-img img{width:100%;height:100%;object-fit:cover;transition:transform .4s;}
+    .hero-cookie-card:hover .hcc-img img{transform:scale(1.08);}
+    .hcc-img .img-fallback{display:none;height:100%;align-items:center;justify-content:center;font-size:2.4rem;background:var(--amber-100);}
+    .hcc-img img.broken{display:none;}
+    .hcc-img img.broken~.img-fallback{display:flex;}
+    .hcc-body{padding:12px 14px 14px;}
+    .cookie-name{font-size:0.78rem;font-weight:700;color:var(--smoke-800);}
+    .cookie-price{font-size:0.9rem;font-weight:800;color:var(--amber-600);}
+    .hero-badge-float{position:absolute;top:-10px;right:-10px;background:var(--amber-400);color:var(--smoke-900);width:64px;height:64px;border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:0.6rem;font-weight:800;text-transform:uppercase;letter-spacing:0.05em;box-shadow:0 4px 16px rgba(245,158,11,.4);animation:spin-slow 8s linear infinite;}
+    @keyframes spin-slow{from{transform:rotate(0deg);}to{transform:rotate(360deg);}}
+    .hero-badge-float .num{font-size:1.2rem;font-weight:900;}
+    .marquee-wrap{background:var(--mirage-800);padding:14px 0;overflow:hidden;}
+    .marquee-track{display:flex;gap:48px;animation:mq 22s linear infinite;white-space:nowrap;}
+    .marquee-track span{font-size:0.78rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--amber-300);flex-shrink:0;}
+    .marquee-track span.sep{color:var(--amber-600);}
+    @keyframes mq{from{transform:translateX(0);}to{transform:translateX(-50%);}}
+    .featured-section{padding:80px 5vw;}
+    .section-header{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:48px;flex-wrap:wrap;gap:20px;}
+    .cookie-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;}
+    .product-card{background:white;border-radius:20px;overflow:hidden;box-shadow:var(--shadow);transition:transform .25s,box-shadow .25s;}
+    .product-card:hover{transform:translateY(-8px);box-shadow:var(--shadow-lg);}
+    .product-card-img{height:200px;position:relative;}
+    .product-card-img .img-fallback{display:none;height:100%;align-items:center;justify-content:center;font-size:5rem;}
+    .product-card-img .img-fallback.bg-amber{background:linear-gradient(135deg,var(--amber-100),var(--amber-200));}
+    .product-card-img .img-fallback.bg-mirage{background:linear-gradient(135deg,var(--mirage-100),var(--mirage-200));}
+    .product-card-img .img-fallback.bg-smoke{background:linear-gradient(135deg,var(--smoke-100),var(--smoke-200));}
+    .product-card-img img.broken{display:none;}
+    .product-card-img img.broken~.img-fallback{display:flex;}
+    .product-badge{position:absolute;top:14px;left:14px;z-index:2;}
+    .product-card-body{padding:20px 22px 24px;}
+    .product-name{font-size:1.05rem;font-weight:800;color:var(--smoke-900);margin-bottom:6px;}
+    .product-desc{font-size:0.82rem;color:var(--text-secondary);margin-bottom:16px;line-height:1.6;}
+    .product-footer{display:flex;align-items:center;justify-content:space-between;}
+    .product-price{font-size:1.2rem;font-weight:900;color:var(--amber-700);}
+    .product-price small{font-size:0.72rem;color:var(--text-muted);font-weight:500;}
+    .add-btn{width:38px;height:38px;border-radius:10px;background:var(--amber-500);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:1.2rem;transition:all .2s;color:var(--smoke-900);}
+    .add-btn:hover{background:var(--amber-400);transform:scale(1.1);}
+    .why-section{padding:80px 5vw;background:linear-gradient(135deg,var(--mirage-900) 0%,var(--mirage-800) 100%);}
+    .why-section .section-label{color:var(--amber-400);}
+    .why-section .section-title{color:white;}
+    .why-section .section-sub{color:var(--mirage-300);}
+    .why-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:24px;margin-top:48px;}
+    .why-card{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);border-radius:16px;padding:28px 22px;transition:background .2s;}
+    .why-card:hover{background:rgba(255,255,255,.10);}
+    .why-icon{font-size:2rem;margin-bottom:16px;}
+    .why-title{font-size:0.95rem;font-weight:700;color:var(--amber-200);margin-bottom:8px;}
+    .why-desc{font-size:0.82rem;color:var(--mirage-300);line-height:1.7;}
+    .testi-section{padding:80px 5vw;}
+    .testi-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;margin-top:48px;}
+    .testi-card{background:white;border-radius:16px;padding:28px;box-shadow:var(--shadow);border-top:4px solid var(--amber-400);}
+    .testi-stars{color:var(--amber-400);font-size:1.1rem;margin-bottom:14px;}
+    .testi-text{font-size:0.88rem;color:var(--smoke-700);line-height:1.75;margin-bottom:20px;font-style:italic;}
+    .testi-author{display:flex;align-items:center;gap:12px;}
+    .testi-avatar{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.2rem;background:var(--amber-100);}
+    .testi-name{font-size:0.85rem;font-weight:700;color:var(--smoke-900);}
+    .testi-role{font-size:0.75rem;color:var(--text-muted);}
+    .cta-banner{margin:0 5vw 80px;background:linear-gradient(135deg,var(--amber-500),var(--amber-700));border-radius:24px;padding:56px 60px;display:flex;align-items:center;justify-content:space-between;gap:32px;flex-wrap:wrap;position:relative;overflow:hidden;}
+    .cta-banner::before{content:'🍪';position:absolute;right:220px;top:-20px;font-size:10rem;opacity:.12;}
+    .cta-banner::after{content:'✨';position:absolute;right:60px;bottom:-10px;font-size:6rem;opacity:.15;}
+    .cta-text h2{font-size:clamp(1.4rem,3vw,2rem);font-weight:900;color:white;letter-spacing:-0.03em;margin-bottom:8px;}
+    .cta-text p{font-size:0.95rem;color:rgba(255,255,255,.85);}
+    .btn-cta-white{background:white;color:var(--amber-800);font-weight:800;padding:15px 36px;border-radius:12px;font-size:0.95rem;font-family:'Montserrat',sans-serif;border:none;cursor:pointer;transition:all .2s;white-space:nowrap;}
+    .btn-cta-white:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,.2);}
+    @media(max-width:900px){.hero{grid-template-columns:1fr;padding:48px 5vw;}.hero-visual{display:none;}.cookie-grid{grid-template-columns:1fr 1fr;}.why-grid{grid-template-columns:1fr 1fr;}.testi-grid{grid-template-columns:1fr;}}
+    @media(max-width:600px){.cookie-grid{grid-template-columns:1fr;}.why-grid{grid-template-columns:1fr;}.cta-banner{padding:36px 28px;}}
+  </style>
+</head>
+<body>
+<nav class="navbar">
+  <a href="index.html" class="nav-logo"><span class="icon">🍪</span> CrunchCo</a>
+  <ul class="nav-links" id="navLinks">
+    <li><a href="index.html" class="active">Beranda</a></li>
+    <li><a href="menu.html">Menu</a></li>
+    <li><a href="about.html">Tentang Kami</a></li>
+    <li><a href="tracking.html" class="nav-track">📦 Pesananku</a></li>
+    <li><a href="order.html" class="nav-cta">Pesan Sekarang</a></li>
+  </ul>
+  <div class="nav-hamburger" onclick="toggleNav()"><span></span><span></span><span></span></div>
+</nav>
+
+<section class="hero">
+  <div class="hero-content">
+    <div class="hero-eyebrow"><span class="dot"></span> Artisan Cookies · Dibuat Segar Setiap Hari</div>
+    <h1 class="hero-title">Setiap Gigitan<br>Adalah <span class="highlight">Kebahagiaan</span><br>Tersendiri</h1>
+    <p class="hero-desc">Kami memanggang cookie dengan bahan-bahan pilihan terbaik, tanpa pengawet, penuh cinta. Dari dapur kami langsung ke tangan Anda.</p>
+    <div class="hero-actions">
+      <a href="menu.html" class="btn btn-primary btn-lg">Lihat Menu 🍪</a>
+      <a href="about.html" class="btn btn-secondary btn-lg">Cerita Kami</a>
+    </div>
+    <div class="hero-stats">
+      <div class="stat-item"><div class="stat-num">20<span>+</span></div><div class="stat-label">Varian Cookie</div></div>
+      <div class="stat-item"><div class="stat-num">5k<span>+</span></div><div class="stat-label">Pelanggan Puas</div></div>
+      <div class="stat-item"><div class="stat-num">3<span>th</span></div><div class="stat-label">Pengalaman Memanggang</div></div>
+    </div>
+  </div>
+  <div class="hero-visual">
+    <div class="hero-cookie-grid">
+      <div class="hero-cookie-card">
+        <div class="hcc-img"><img src="images/choco-chip-classic.jpg" alt="Choco Chip Classic" loading="lazy" onerror="this.classList.add('broken')"/><div class="img-fallback">🍪</div></div>
+        <div class="hcc-body"><div class="cookie-name">Choco Chip Classic</div><div class="cookie-price">Rp 25k</div></div>
+      </div>
+      <div class="hero-cookie-card featured">
+        <div class="hcc-img"><img src="images/blueberry-crumble.jpg" alt="Blueberry Crumble" loading="lazy" onerror="this.classList.add('broken')"/><div class="img-fallback" style="background:linear-gradient(135deg,var(--mirage-700),var(--mirage-800))">🫐</div></div>
+        <div class="hcc-body"><div class="cookie-name">Blueberry Crumble</div><div class="cookie-price">Rp 30k</div></div>
+      </div>
+      <div class="hero-cookie-card">
+        <div class="hcc-img"><img src="images/lemon-zesty.jpg" alt="Lemon Zesty" loading="lazy" onerror="this.classList.add('broken')"/><div class="img-fallback">🍋</div></div>
+        <div class="hcc-body"><div class="cookie-name">Lemon Zesty</div><div class="cookie-price">Rp 28k</div></div>
+      </div>
+      <div class="hero-cookie-card">
+        <div class="hcc-img"><img src="images/peanut-butter-bliss.jpg" alt="Peanut Butter" loading="lazy" onerror="this.classList.add('broken')"/><div class="img-fallback">🥜</div></div>
+        <div class="hcc-body"><div class="cookie-name">Peanut Butter Bliss</div><div class="cookie-price">Rp 27k</div></div>
+      </div>
+    </div>
+    <div class="hero-badge-float"><span class="num">⭐</span><span>4.9</span><span>RATING</span></div>
+  </div>
+</section>
+
+<div class="marquee-wrap"><div class="marquee-track"><span>🍪 Choco Chip</span><span class="sep">✦</span><span>🫐 Blueberry</span><span class="sep">✦</span><span>🍋 Lemon Zesty</span><span class="sep">✦</span><span>🥜 Peanut Butter</span><span class="sep">✦</span><span>🍓 Strawberry Jam</span><span class="sep">✦</span><span>🍫 Double Choco</span><span class="sep">✦</span><span>🥥 Coconut Delight</span><span class="sep">✦</span><span>🍪 Choco Chip</span><span class="sep">✦</span><span>🫐 Blueberry</span><span class="sep">✦</span><span>🍋 Lemon Zesty</span><span class="sep">✦</span><span>🥜 Peanut Butter</span><span class="sep">✦</span><span>🍓 Strawberry Jam</span><span class="sep">✦</span><span>🍫 Double Choco</span><span class="sep">✦</span><span>🥥 Coconut Delight</span><span class="sep">✦</span></div></div>
+
+<section class="featured-section">
+  <div class="section-header">
+    <div><p class="section-label">✦ Pilihan Terpopuler</p><h2 class="section-title">Favorit Para<br>Pelanggan Kami</h2><div class="divider"></div></div>
+    <a href="menu.html" class="btn btn-outline">Lihat Semua Menu →</a>
+  </div>
+  <div class="cookie-grid">
+
+    <div class="product-card">
+      <div class="product-card-img">
+        <div class="img-wrap"><img src="images/choco-chip-classic.jpg" alt="Choco Chip Classic" loading="lazy" onerror="this.classList.add('broken')"/><div class="img-fallback bg-amber">🍪</div></div>
+        <div class="product-badge"><span class="badge badge-amber">Terlaris</span></div>
+      </div>
+      <div class="product-card-body">
+        <div class="product-name">Choco Chip Classic</div>
+        <div class="product-desc">Cookie renyah dengan biji coklat premium dan mentega Prancis yang meleleh di mulut.</div>
+        <div class="product-footer"><div class="product-price">Rp 25.000 <small>/ pcs</small></div><button class="add-btn" onclick="addToCart('Choco Chip Classic')">+</button></div>
+      </div>
+    </div>
+
+    <div class="product-card">
+      <div class="product-card-img">
+        <div class="img-wrap"><img src="images/blueberry-crumble.jpg" alt="Blueberry Crumble" loading="lazy" onerror="this.classList.add('broken')"/><div class="img-fallback bg-mirage">🫐</div></div>
+        <div class="product-badge"><span class="badge badge-mirage">Baru</span></div>
+      </div>
+      <div class="product-card-body">
+        <div class="product-name">Blueberry Crumble</div>
+        <div class="product-desc">Perpaduan blueberry segar dengan taburan crumble yang gurih dan tekstur lembut sempurna.</div>
+        <div class="product-footer"><div class="product-price">Rp 30.000 <small>/ pcs</small></div><button class="add-btn" onclick="addToCart('Blueberry Crumble')">+</button></div>
+      </div>
+    </div>
+
+    <div class="product-card">
+      <div class="product-card-img">
+        <div class="img-wrap"><img src="images/lemon-zesty.jpg" alt="Lemon Zesty" loading="lazy" onerror="this.classList.add('broken')"/><div class="img-fallback bg-smoke">🍋</div></div>
+        <div class="product-badge"><span class="badge badge-smoke">Favorit</span></div>
+      </div>
+      <div class="product-card-body">
+        <div class="product-name">Lemon Zesty</div>
+        <div class="product-desc">Segar dan aromatik, dibuat dari lemon asli yang memberikan sensasi citrus yang menyegarkan.</div>
+        <div class="product-footer"><div class="product-price">Rp 28.000 <small>/ pcs</small></div><button class="add-btn" onclick="addToCart('Lemon Zesty')">+</button></div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<section class="why-section">
+  <p class="section-label">✦ Mengapa CrunchCo</p>
+  <h2 class="section-title">Kualitas Yang Kami Janjikan</h2>
+  <p class="section-sub">Kami tidak berkompromi dalam hal bahan, rasa, dan kepuasan pelanggan.</p>
+  <div class="why-grid">
+    <div class="why-card"><div class="why-icon">🌾</div><div class="why-title">Bahan Premium</div><div class="why-desc">Tepung terigu protein tinggi, mentega Prancis, dan coklat Belgia pilihan untuk rasa terbaik.</div></div>
+    <div class="why-card"><div class="why-icon">🚫</div><div class="why-title">No Preservatives</div><div class="why-desc">100% alami tanpa bahan pengawet, pewarna buatan, atau pemanis kimia.</div></div>
+    <div class="why-card"><div class="why-icon">🔥</div><div class="why-title">Dipanggang Segar</div><div class="why-desc">Setiap pesanan dipanggang fresh hari itu juga. Tidak ada stok lama di rak kami.</div></div>
+    <div class="why-card"><div class="why-icon">📦</div><div class="why-title">Pengiriman Cepat</div><div class="why-desc">Dikemas dengan box premium untuk menjaga kesegaran dan pengiriman same-day Jakarta.</div></div>
+  </div>
+</section>
+
+<section class="testi-section">
+  <p class="section-label">✦ Apa Kata Mereka</p>
+  <h2 class="section-title">Ulasan Pelanggan</h2>
+  <div class="divider"></div>
+  <div class="testi-grid">
+    <div class="testi-card"><div class="testi-stars">★★★★★</div><p class="testi-text">"Ini beneran cookie terenak yang pernah aku coba! Choco chip-nya renyah di luar, soft di dalam. Udah jadi langganan bulanan!"</p><div class="testi-author"><div class="testi-avatar">👩</div><div><div class="testi-name">Anindita R.</div><div class="testi-role">Pelanggan Setia</div></div></div></div>
+    <div class="testi-card"><div class="testi-stars">★★★★★</div><p class="testi-text">"Beli buat hantaran nikahan dan semua tamu pada suka banget! Packagingnya cantik, rasanya premium. Highly recommended!"</p><div class="testi-author"><div class="testi-avatar">👨</div><div><div class="testi-name">Budi Santoso</div><div class="testi-role">Pelanggan Korporat</div></div></div></div>
+    <div class="testi-card"><div class="testi-stars">★★★★★</div><p class="testi-text">"Blueberry crumble-nya WAW banget! Asem manisnya pas dan crumble-nya bikin ketagihan. Pengiriman juga super cepat!"</p><div class="testi-author"><div class="testi-avatar">👩‍🦱</div><div><div class="testi-name">Dewi Lestari</div><div class="testi-role">Food Blogger</div></div></div></div>
+  </div>
+</section>
+
+<div class="cta-banner">
+  <div class="cta-text"><h2>Siap Manjakan Diri?<br>Pesan Sekarang & Nikmati!</h2><p>Gratis ongkir untuk pembelian pertama minimum Rp 150.000</p></div>
+  <a href="order.html"><button class="btn-cta-white">🍪 Pesan Sekarang</button></a>
+</div>
+
+<footer>
+  <div class="footer-grid">
+    <div class="footer-brand"><h3>🍪 CrunchCo</h3><p>Artisan cookies dibuat dengan bahan terbaik dan penuh cinta. Dari dapur kami langsung ke momen bahagia Anda.</p></div>
+    <div class="footer-col"><h4>Navigasi</h4><a href="index.html">Beranda</a><a href="menu.html">Menu Lengkap</a><a href="about.html">Tentang Kami</a><a href="tracking.html">Lacak Pesanan</a><a href="order.html">Pemesanan</a></div>
+    <div class="footer-col"><h4>Kontak</h4><a href="#">📍 Jakarta Selatan</a><a href="#">📞 0812-3456-7890</a><a href="#">✉️ hello@crunchco.id</a><a href="#">🕐 Sen–Sab, 08.00–20.00</a></div>
+  </div>
+  <div class="footer-bottom"><p>© 2025 CrunchCo. All rights reserved.</p><p>Made with 🧡 in Jakarta</p></div>
+</footer>
+
+<div class="toast" id="toast"></div>
+<script>
+function toggleNav(){document.getElementById('navLinks').classList.toggle('open');}
+function addToCart(name){const t=document.getElementById('toast');t.textContent=`🛒 "${name}" ditambahkan!`;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2800);}
+</script>
+</body>
+</html>
